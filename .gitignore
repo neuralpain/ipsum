@@ -1,0 +1,9 @@
+.DS_Store
+
+*.pdf
+*.txt
+*.bak
+*.bak.*
+*test*
+
+TODO
