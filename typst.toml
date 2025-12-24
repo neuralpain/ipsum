@@ -1,0 +1,13 @@
+[package]
+name = "ipsum"
+version = "0.1.0"
+entrypoint = "lib.typ"
+authors = ["neuralpain <https://github.com/neuralpain>"]
+license = "MIT"
+description = "Generate blind text that feels natural."
+repository = "https://github.com/neuralpain/ipsum"
+keywords = [
+  "lorem", "ipsum", "dolor", "sit", "amet",
+  "generate", "blind", "text"
+]
+categories = ["layout"]
