@@ -1,12 +1,29 @@
 /*
   File: ipsum.typ
   Author: neuralpain
-  Date Modified: 2025-12-26
+  Date Modified: 2025-12-27
 
   Description: Lorem's Ipsum.
 */
 
 #let __golden = 0.61803398875
+
+#let _hint(mode, params) = {
+  block(
+    fill: rgb("#e6f7ff"),
+    stroke: 1pt + blue.lighten(30%),
+    inset: 0.8em,
+    radius: 4pt,
+    width: 100%,
+    below: 1em,
+  )[
+    #set text(fill: blue.darken(30%), size: 0.9em)
+    #box(inset: (right: 0.5em))[#emoji.info]
+    *Available parameters for mode '#raw(mode)':*
+    #h(0.5em)
+    #params.map(p => raw(p)).join(", ")
+  ]
+}
 
 #let ipsum(
   mode: "natural",
@@ -32,7 +49,20 @@
   seed: 42,
   // Dialogue
   events: 10,
+  // System
+  hint: false,
 ) = {
+  let param-map = (
+    "natural":    ("pars", "average", "var", "seed", "indent"),
+    "grow":       ("pars", "base", "mult", "indent"),
+    "fade":       ("pars", "start", "ratio", "indent"),
+    "fit":        ("pars", "total", "ratio", "indent"),
+    "dialogue":   ("events", "ratio", "seed", "indent"),
+    "fibonacci":  ("steps", "reverse"),
+  )
+
+  if hint { _hint(mode, param-map.at(mode)) }
+
   if mode == "fade" {
     stack(dir: ttb, spacing: spacing,
       ..range(0, pars).map(i => {
