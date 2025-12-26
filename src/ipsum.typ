@@ -65,7 +65,7 @@
   total: 300,
   // Logarithmic
   base: 20,
-  mult: 30,
+  factor: 30,
   stats: false,
   paragraph-word-count: false,
   // Fibonacci
@@ -95,7 +95,7 @@
 
   let param-map = (
     "natural":    ("pars", "average", "var", "seed", "indent"),
-    "grow":       ("pars", "base", "mult", "indent"),
+    "grow":       ("pars", "base", "factor", "indent"),
     "fade":       ("pars", "start", "ratio", "indent"),
     "fit":        ("pars", "total", "ratio", "indent"),
     "dialogue":   ("events", "ratio", "seed", "indent"),
@@ -198,7 +198,7 @@
   if mode == "grow" {
     stack(dir: ttb, spacing: spacing,
       ..range(1, pars + 1).map(i => {
-        let count = int(base + (mult * calc.ln(i)))
+        let count = int(base + (factor * calc.ln(i)))
         [
           #if paragraph-word-count { text(weight: "bold")[#count words:] }
           #h(indent)#lorem(count)
