@@ -77,6 +77,7 @@
   seed: 42,
   // Dialogue
   events: 10,
+  h-indent: 0em,
   // System
   hint: false,
   ignore-limits: false,
@@ -290,7 +291,9 @@
 
         if is-dialogue {
           let len = int(3 + calc.abs(length-noise * 12))
-          [#h(indent)“#lorem(len)#if len < 10 {"?"}”]
+          par(hanging-indent: h-indent)[
+            #h(indent)“#lorem(len)#if len < 10 {"?"}”
+          ]
         } else {
           let len = int(25 + calc.abs(length-noise * 45))
           [#h(indent)#lorem(len)]
