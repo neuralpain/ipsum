@@ -8,6 +8,34 @@
 
 #let __golden = 0.61803398875
 
+#let _err(msg, title: "Error") = {
+  block(
+    fill: rgb("#ffcccc"),
+    stroke: 1pt + red,
+    inset: 1em,
+    radius: 4pt,
+    width: 100%,
+  )[
+    #set text(fill: red.darken(30%))
+    #box(inset: (right: 0.5em))[#emoji.warning]
+    #h(0.3em)*#raw(title + ": ")*#raw(msg)
+  ]
+}
+
+#let _warn(msg, title: "Warning") = {
+  block(
+    fill: rgb("#fff4cc"),
+    stroke: 1pt + orange.darken(10%),
+    inset: 1em,
+    radius: 4pt,
+    width: 100%,
+  )[
+    #set text(fill: orange.darken(40%))
+    #box(inset: (right: 0.5em))[#emoji.warning]
+    #h(0.3em)*#raw(title + ": ")*#raw(msg)
+  ]
+}
+
 #let _hint(mode, params) = {
   block(
     fill: rgb("#e6f7ff"),
@@ -51,7 +79,20 @@
   events: 10,
   // System
   hint: false,
+  ignore-limits: false,
+  ignore-warnings: false,
 ) = {
+  let seed-threshold = 1000000000000 // one trillion
+
+  let valid-modes = (
+    "natural",    // Natural human flow
+    "grow",       // Logarithmic
+    "fade",       // Geometric
+    "fit",        // Geometric
+    "dialogue",   // Natural speech patterns
+    "fibonacci",  // Mathematic
+  )
+
   let param-map = (
     "natural":    ("pars", "average", "var", "seed", "indent"),
     "grow":       ("pars", "base", "mult", "indent"),
@@ -61,7 +102,85 @@
     "fibonacci":  ("steps", "reverse"),
   )
 
+  if type(mode) != str {
+    return _err("Mode must be of type `string`.")
+  }
+
+  if mode.len() == 0 {
+    _err("Mode cannot be empty.")
+    _err(title: "Valid modes", valid-modes.join(", "))
+    return
+  }
+
+  if mode not in valid-modes {
+    _err("Unknown mode '" + mode + "'.")
+    _err(title: "Valid modes", valid-modes.join(", "))
+    return
+  }
+
+  for (key, value) in param-map {
+    if mode == key and "pars" in value and pars < 1 {
+      return _err(title: "Invalid value", "`pars` must be >= 1.")
+    }
+  }
+
+  if mode == "fade" {
+    if start < 1 { return _err(title: "Invalid value", "Start count must be positive.") }
+    if ratio < 0 { return _err(title: "Invalid value", "`ratio` cannot be negative.") }
+  }
+
+  if mode == "grow" {
+    // Ln(1) is 0, so base must handle the minimum size
+    if base < 1 { return _err("`base` size must be positive.") }
+  }
+
+  if mode == "fit" {
+    if total < pars {
+      return _err("Total words (" + str(total) + ") is too low for " + str(pars) + " pars.")
+    }
+    // The formula uses division by (1 - ratio). If ratio is 1.0, this causes division by zero.
+    if ratio == 1.0 { return _err("Division by zero. `ratio` cannot be exactly 1.0 in fit. Use 0.99 or 1.01.") }
+    if ratio <= 0 { return _err("`ratio` must be positive.") }
+  }
+
+  if mode == "fibonacci" {
+    if steps < 1 { return _err("`steps` must be >= 1.") }
+    if steps > 30 {
+      let msg = "`steps` too high (>30)."
+      if ignore-limits and not ignore-warnings { _warn(msg) }
+      else { _err() }
+      return
+    }
+  }
+
+  if mode == "natural" {
+    if average < 5 { return _err("Average word count too low (min 5).") }
+    // Ensure var doesn't create negative lengths
+    if (average - var) < 0 {
+      return _err("`var` (" + str(var) + ") is higher than `average` (" + str(average) + "); this may result in negative word counts.")
+    }
+  }
+
+  if mode == "dialogue" {
+    if events < 1 { return _err("`events` must be >= 1.") }
+    if ratio < 0.0 or ratio > 1.0 { return _err("Talk ratio must be between 0.0 and 1.0.") }
+  }
+
   if hint { _hint(mode, param-map.at(mode)) }
+
+  if not ignore-warnings {
+    if seed > seed-threshold { _warn("Set `seed` between 1 and one trillion for best results.") }
+    if pars > 50 or total > 2000 or steps > 20 { _warn("High volume requested. System may be slow to respond.") }
+    if steps > 12 and reverse { _warn("Fibonacci steps > 12 with reverse: true creates a very large leading paragraph.") }
+    if mode == "dialogue" and (ratio < 0.1 or ratio > 0.9) {
+      _warn("Extreme `ratio` may result in no dialogue or no narrative text.")
+    }
+    if mode == "fit" and ratio > 0.95 and ratio < 1.05 {
+      _warn("Ratio is very close to 1.0; paragraph lengths may appear identical due to integer rounding.")
+    }
+  }
+
+  if mode == "fibonacci" or mode == "dialogue" { pars = 0 }
 
   if mode == "fade" {
     stack(dir: ttb, spacing: spacing,
