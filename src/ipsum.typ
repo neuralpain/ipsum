@@ -132,6 +132,7 @@
   if mode == "grow" {
     // Ln(1) is 0, so base must handle the minimum size
     if base < 1 { return _err("`base` size must be positive.") }
+    if factor < 5 { _warn("`factor` size too small for any significant change.") }
   }
 
   if mode == "fit" {
