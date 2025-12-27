@@ -148,9 +148,8 @@
   if mode == "fibonacci" {
     if steps < 1 { return _err("`steps` must be >= 1.") }
     if steps > 30 {
-      let msg = "`steps` too high (>30)."
-      if ignore-limits and not ignore-warnings { _warn(msg) }
-      else { _err() }
+      if ignore-limits and not ignore-warnings { _warn("`steps` too high (>30). System may be slow to respond.") }
+      else if not ignore-limits { _err("`steps` too high (>30).") }
       return
     }
   }
