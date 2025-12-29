@@ -1,7 +1,7 @@
 /*
   File: ipsum.typ
   Author: neuralpain
-  Date Modified: 2025-12-27
+  Date Modified: 2025-12-29
 
   Description: Lorem's Ipsum.
 */
@@ -83,7 +83,13 @@
   ignore-limits: false,
   ignore-warnings: false,
 ) = {
+  let average-minimum = 5
   let seed-threshold = 1000000000000 // one trillion
+  let pars-threshold = 50
+  let words-threshold = 100000
+  let fib-threshold = 25
+  let fib-high-volume = 20
+  let fib-large-volume = 15
 
   let valid-modes = (
     "natural",    // Natural human flow
@@ -104,11 +110,11 @@
   )
 
   if type(mode) != str {
-    return _err("Mode must be of type `string`.")
+    return _err("`mode` must be of type `string`.")
   }
 
   if mode.len() == 0 {
-    _err("Mode cannot be empty.")
+    _err("`mode` cannot be empty.")
     _err(title: "Valid modes", valid-modes.join(", "))
     return
   }
@@ -126,14 +132,22 @@
   }
 
   if mode == "fade" {
-    if start < 1 { return _err(title: "Invalid value", "Start count must be positive.") }
-    if ratio < 0 { return _err(title: "Invalid value", "`ratio` cannot be negative.") }
+    if start < 1 {
+      return _err(title: "Invalid value", "Start count must be positive.")
+    }
+    if ratio < 0 {
+      return _err(title: "Invalid value", "`ratio` cannot be negative.")
+    }
   }
 
   if mode == "grow" {
     // Ln(1) is 0, so base must handle the minimum size
-    if base < 1 { return _err("`base` size must be positive.") }
-    if factor < 5 { _warn("`factor` size too small for any significant change.") }
+    if base < 1 {
+      return _err(title: "Invalid value", "`base` size must be positive.")
+    }
+    if factor < 5 {
+      _warn("`factor` size too small for any significant change.")
+    }
   }
 
   if mode == "fit" {
@@ -141,43 +155,66 @@
       return _err("Total words (" + str(total) + ") is too low for " + str(pars) + " pars.")
     }
     // The formula uses division by (1 - ratio). If ratio is 1.0, this causes division by zero.
-    if ratio == 1.0 { return _err("Division by zero. `ratio` cannot be exactly 1.0 in fit. Use 0.99 or 1.01.") }
-    if ratio <= 0 { return _err("`ratio` must be positive.") }
+    if ratio == 1.0 {
+      return _err("Division by zero. `ratio` cannot be exactly 1.0 in fit. Use 0.99 or 1.01.")
+    }
+    if ratio <= 0 {
+      return _err("`ratio` must be positive.")
+    }
   }
 
   if mode == "fibonacci" {
-    if steps < 1 { return _err("`steps` must be >= 1.") }
-    if steps > 30 {
-      if ignore-limits and not ignore-warnings { _warn("`steps` too high (>30). System may be slow to respond.") }
-      else if not ignore-limits { _err("`steps` too high (>30).") }
-      return
+    if steps < 1 {
+      return _err(title: "Invalid value", "`steps` must be >= 1.")
+    }
+    if steps > fib-threshold {
+      if ignore-limits and not ignore-warnings {
+        _warn("High `steps` value (>" + str(fib-threshold) + "). System may be slow to respond.")
+      } else if not ignore-limits {
+        return _err(title: "Limit Reached", "Larger `steps` value may result in poor performance or responsiveness.")
+      }
     }
   }
 
   if mode == "natural" {
-    if average < 5 { return _err("Average word count too low (min 5).") }
+    if average < average-minimum {
+      return _err("Average word count too low (min " + str(average-minimum) + ").")
+    }
     // Ensure var doesn't create negative lengths
     if (average - var) < 0 {
-      return _err("`var` (" + str(var) + ") is higher than `average` (" + str(average) + "); this may result in negative word counts.")
+      return _err("`var` (" + str(var) + ") is higher than `average` (" + str(average) + "). This may result in negative word counts.")
     }
   }
 
   if mode == "dialogue" {
-    if events < 1 { return _err("`events` must be >= 1.") }
-    if ratio < 0.0 or ratio > 1.0 { return _err("Talk ratio must be between 0.0 and 1.0.") }
+    if events < 1 {
+      return _err(title: "Invalid value", "`events` must be >= 1.")
+    }
+    if ratio < 0.0 or ratio > 1.0 {
+      return _err(title: "Invalid value", "Talk ratio must be between 0.0 and 1.0.")
+    }
   }
 
   if hint { _hint(mode, param-map.at(mode)) }
 
   if not ignore-warnings {
     if seed > seed-threshold { _warn("Set `seed` between 1 and one trillion for best results.") }
-    if pars > 50 or total > 2000 or steps > 20 { _warn("High volume requested. System may be slow to respond.") }
-    if steps > 12 and reverse { _warn("Fibonacci steps > 12 with reverse: true creates a very large leading paragraph.") }
+    if pars > pars-threshold {
+      _warn(title: "High volume", "System may be slow to respond.")
+    }
+    if total > words-threshold or (mode == "fibonacci" and steps > fib-high-volume) {
+      _warn(title: "High volume", "System may be slow to respond.")
+    }
+    if mode == "fibonacci" and steps >= fib-large-volume and reverse {
+      _warn("Reverse Fibonacci `steps` > " + str(fib-large-volume) + " creates a very large leading paragraph.")
+    } else if steps >= fib-large-volume {
+      _warn("Fibonacci `steps` > " + str(fib-large-volume) + " creates very large paragraphs.")
+    }
     if mode == "dialogue" and (ratio < 0.1 or ratio > 0.9) {
-      _warn("Extreme `ratio` may result in no dialogue or no narrative text.")
+      _warn("Extreme `ratio` value may result in no dialogue or no narrative text.")
     }
     if mode == "fit" and ratio > 0.95 and ratio < 1.05 {
-      _warn("Ratio is very close to 1.0; paragraph lengths may appear identical due to integer rounding.")
+      _warn("`ratio` is very close to 1.0; paragraph lengths may appear identical due to integer rounding.")
     }
   }
 
