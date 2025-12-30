@@ -147,7 +147,7 @@
   // Stats
   let actual-words = 0
   let actual-pars = 0
-  let recommendations = ()
+  let stats-note = ()
 
   let valid-modes = (
     "natural",    // Natural human flow
@@ -292,7 +292,7 @@
     if stats {
       actual-words = results.map(r => r.len).sum()
       actual-pars = results.len()
-      if ratio > 0.9 { recommendations.push("Ratio is high (" + str(ratio) + "). Decrease to fade text faster.") }
+      if ratio > 0.9 { stats-note.push("Ratio is high (" + str(ratio) + "). Decrease to fade text faster.") }
     }
 
     stack(dir: ttb, spacing: spacing, ..results.map(r => r.content))
@@ -335,8 +335,8 @@
       actual-pars = results.len()
       let diff = calc.abs(actual-words - total)
       if diff > (total * 0.05) {
-        recommendations.push("Result deviates from target " + str(total) + " by " + str(diff) + " words due to integer rounding.")
-        recommendations.push("Try slightly adjusting `ratio` or `pars` for better fit.")
+        stats-note.push("Result deviates from target " + str(total) + " by " + str(diff) + " words due to integer rounding.")
+        stats-note.push("Try slightly adjusting `ratio` or `pars` for better fit.")
       }
     }
 
@@ -396,7 +396,7 @@
       actual-words = results.map(r => r.len).sum()
       actual-pars = results.len()
       if var > (average * 0.7) {
-        recommendations.push("High variance detected. If paragraphs look too chaotic, reduce `var`.")
+        stats-note.push("High variance detected. If paragraphs look too chaotic, reduce `var`.")
       }
     }
 
@@ -433,6 +433,6 @@
   }
 
   if stats {
-    _nerdstats(mode, actual-words, actual-pars, notes: recommendations)
+    _nerdstats(mode, actual-words, actual-pars, notes: stats-note)
   }
 }
