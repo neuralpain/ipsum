@@ -8,15 +8,38 @@
 
 #let __golden = 0.61803398875
 
+#let info-block = (
+  config: (inset: 1em, radius: 4pt, width: 100%),
+  err: (
+    fill: rgb("#ffcccc"),
+    border: 1pt + red,
+    text: red.darken(30%),
+  ),
+  warn: (
+    fill: rgb("#fff4cc"),
+    border: 1pt + orange.darken(10%),
+    text: orange.darken(40%),
+  ),
+  hint: (
+    fill: rgb("#e6f7ff"),
+    border: 1pt + blue.lighten(30%),
+    text: blue.darken(30%),
+  ),
+  stats: (
+    fill: rgb("#f6ffed"),
+    border: 1pt + rgb("#b7eb8f"),
+    text: rgb("#389e0d"),
+    text-2: gray,
+  ),
+)
+
 #let _err(msg, title: "Error") = {
   block(
-    fill: rgb("#ffcccc"),
-    stroke: 1pt + red,
-    inset: 1em,
-    radius: 4pt,
-    width: 100%,
+    ..info-block.config,
+    fill: info-block.err.fill,
+    stroke: info-block.err.border,
   )[
-    #set text(fill: red.darken(30%))
+    #set text(fill: info-block.err.text)
     #box(inset: (right: 0.5em))[#emoji.warning]
     #h(0.3em)*#raw(title + ": ")*#raw(msg)
   ]
@@ -24,13 +47,11 @@
 
 #let _warn(msg, title: "Warning") = {
   block(
-    fill: rgb("#fff4cc"),
-    stroke: 1pt + orange.darken(10%),
-    inset: 1em,
-    radius: 4pt,
-    width: 100%,
+    ..info-block.config,
+    fill: info-block.warn.fill,
+    stroke: info-block.warn.border,
   )[
-    #set text(fill: orange.darken(40%))
+    #set text(fill: info-block.warn.text)
     #box(inset: (right: 0.5em))[#emoji.warning]
     #h(0.3em)*#raw(title + ": ")*#raw(msg)
   ]
@@ -38,18 +59,17 @@
 
 #let _hint(mode, params) = {
   block(
-    fill: rgb("#e6f7ff"),
-    stroke: 1pt + blue.lighten(30%),
-    inset: 0.8em,
-    radius: 4pt,
-    width: 100%,
-    below: 1em,
+    ..info-block.config,
+    fill: info-block.hint.fill,
+    stroke: info-block.hint.border,
   )[
-    #set text(fill: blue.darken(30%), size: 0.9em)
-    #box(inset: (right: 0.5em))[#emoji.info]
-    *Available parameters for mode '#raw(mode)':*
+    #set text(fill: info-block.hint.text)
+    #h(0.6em)
+    #box(inset: (right: 0.3em))[#emoji.info]
+    #h(1em)
+    *#raw("Parameter list for mode '" + mode + "':")*
     #h(0.5em)
-    #params.map(p => raw(p)).join(", ")
+    #params.map(p => raw(p)).join(",   ")
   ]
 }
 
@@ -57,33 +77,31 @@
   let avg = if pars > 0 { int(words / pars) } else { 0 }
 
   block(
-    fill: rgb("#f6ffed"),
-    stroke: 1pt + rgb("#b7eb8f"),
-    inset: 1em,
-    radius: 4pt,
-    width: 100%,
+    ..info-block.config,
+    fill: info-block.stats.fill,
+    stroke: info-block.stats.border,
     above: 1.5em,
   )[
-    #set text(fill: rgb("#389e0d"), size: 0.9em)
+    #set text(fill: info-block.stats.text)
     #stack(dir: ttb,
       spacing: 0.8em,
       [
         #box(inset: (right: 0.5em))[#emoji.chart]
-        *`Stats for Nerds`* #h(1fr) #text(fill: gray, size: 0.8em, raw(mode))
+        *`Stats for Nerds`* #h(1fr) #text(fill: info-block.stats.text-2, size: 0.8em, raw(mode))
       ],
-      line(length: 100%, stroke: 0.5pt + rgb("#b7eb8f")),
+      line(length: 100%, stroke: info-block.stats.border),
       grid(
         columns: (1fr, 1fr, 1fr),
         align: center,
-        stack(spacing: 0.5em, text(size: 0.8em, fill: gray)[`Total Words`], text(weight: "bold", size: 1.2em)[#raw(str(words))]),
-        stack(spacing: 0.5em, text(size: 0.8em, fill: gray)[`Paragraphs`], text(weight: "bold", size: 1.2em)[#raw(str(pars))]),
-        stack(spacing: 0.5em, text(size: 0.8em, fill: gray)[`Avg. Length`], text(weight: "bold", size: 1.2em)[#raw(str(avg))]),
+        stack(spacing: 0.5em, text(size: 0.8em, fill: info-block.stats.text-2)[`Total Words`], text(weight: "bold", size: 1.2em)[#raw(str(words))]),
+        stack(spacing: 0.5em, text(size: 0.8em, fill: info-block.stats.text-2)[`Paragraphs`], text(weight: "bold", size: 1.2em)[#raw(str(pars))]),
+        stack(spacing: 0.5em, text(size: 0.8em, fill: info-block.stats.text-2)[`Avg. Length`], text(weight: "bold", size: 1.2em)[#raw(str(avg))]),
       ),
       if notes.len() > 0 {
-        line(length: 100%, stroke: 0.5pt + rgb("#b7eb8f"))
+        line(length: 100%, stroke: info-block.stats.border)
         set text(size: 0.85em)
-        text(weight: "bold")[Notes:]
-        list(marker: [•], ..notes)
+        text(weight: "bold")[`Notes`]
+        list(indent: 1em, marker: [•], raw(..notes))
       }
     )
   ]
