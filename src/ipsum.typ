@@ -109,7 +109,7 @@
 
 #let ipsum(
   mode: "natural",
-  pars: 7,
+  pars: 5,
   indent: 0em,
   start: 100,
   spacing: 1em,
