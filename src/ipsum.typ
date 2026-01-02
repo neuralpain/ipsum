@@ -278,159 +278,165 @@
 
   if mode == "fibonacci" or mode == "dialogue" { pars = 0 }
 
-  if mode == "fade" {
-    let results = range(0, pars).map(i => {
-      let count = int(start * calc.pow(ratio, i))
-      if count < 1 { count = 1 }
-      let content = [
-        #if paragraph-word-count { text(weight: "bold")[#count words:] }
-        #h(indent)#lorem(count)
-      ]
-      (len: count, content: content)
-    })
-
-    if stats {
-      actual-words = results.map(r => r.len).sum()
-      actual-pars = results.len()
-      if ratio > 0.9 { stats-note.push("Ratio is high (" + str(ratio) + "). Decrease to fade text faster.") }
-    }
-
-    stack(dir: ttb, spacing: spacing, ..results.map(r => r.content))
-  }
-
-  if mode == "grow" {
-    let results = range(1, pars + 1).map(i => {
-      let count = int(base + (factor * calc.ln(i)))
-      let content = [
-        #if paragraph-word-count { text(weight: "bold")[#count words:] }
-        #h(indent)#lorem(count)
-      ]
-      (len: count, content: content)
-    })
-
-    if stats {
-      actual-words = results.map(r => r.len).sum()
-      actual-pars = results.len()
-    }
-
-    stack(dir: ttb, spacing: spacing, ..results.map(r => r.content))
-  }
-
-  if mode == "fit" {
-    // a = S * (1 - r) / (1 - r^n)
-    let first-len = total * (1 - ratio) / (1 - calc.pow(ratio, pars))
-
-    let results = range(0, pars).map(i => {
-      let len = int(first-len * calc.pow(ratio, i))
-      if len < 1 { len = 1 }
-      let content = [
-        #if paragraph-word-count { text(weight: "bold")[#len words:] }
-        #h(indent)#lorem(len)
-      ]
-      (len: len, content: content)
-    })
-
-    if stats {
-      actual-words = results.map(r => r.len).sum()
-      actual-pars = results.len()
-      let diff = calc.abs(actual-words - total)
-      if diff > (total * 0.05) {
-        stats-note.push("Result deviates from target " + str(total) + " by " + str(diff) + " words due to integer rounding.")
-        stats-note.push("Try slightly adjusting `ratio` or `pars` for better fit.")
-      }
-    }
-
-    stack(dir: ttb, spacing: spacing, ..results.map(r => r.content))
-  }
-
-  if mode == "fibonacci" {
-    set par(justify: true, first-line-indent: 1.5em)
-
-    let get-fibs(steps) = {
-      let nums = (1, 1)
-      while nums.len() < steps {
-        let len = nums.len()
-        let next = nums.at(len - 1) + nums.at(len - 2)
-        nums.push(next)
-      }
-      return nums
-    }
-
-    let fibs = get-fibs(steps)
-    let reversed-fibs = if reverse { fibs.rev() } else { fibs }
-
-    if stats {
-      actual-words = reversed-fibs.sum()
-      actual-pars = reversed-fibs.len()
-    }
-
-    stack(dir: ttb, spacing: spacing, ..reversed-fibs.map(count => {
-      grid(
-        columns: (3em, 1fr),
-        gutter: 1em,
-        align(right + top)[
-          #text(weight: "bold", fill: gray)[#count]
-        ],
-        [#lorem(count)],
-      )
-    }))
-  }
-
-  if mode == "natural" {
-    let results = range(0, pars).map(i => {
-      let noise = calc.sin((i + 1) * seed)
-      let len = int(average + (noise * var))
-
-      if noise > 0.8 {
-        len = int(len * 1.5)
-      } else if noise < -0.8 {
-        len = int(len * 0.4)
-      }
-
-      if len < 5 { len = 5 }
-
-      (len: len, content: [#h(indent)#lorem(len)])
-    })
-
-    if stats {
-      actual-words = results.map(r => r.len).sum()
-      actual-pars = results.len()
-      if var > (average * 0.7) {
-        stats-note.push("High variance detected. If paragraphs look too chaotic, reduce `var`.")
-      }
-    }
-
-    stack(dir: ttb, spacing: spacing, ..results.map(r => r.content))
-  }
-
-  if mode == "dialogue" {
-    let results = range(0, events).map(i => {
-      let noise = calc.sin((i + 9) * seed)
-      let length-noise = calc.cos((i + 3) * seed)
-      let is-dialogue = noise < (ratio * 2 - 1)
-      let len = 0
-      let content = []
-
-      if is-dialogue {
-        len = int(3 + calc.abs(length-noise * 12))
-        content = par(hanging-indent: h-indent)[
-          #h(indent)“#lorem(len)#if len < 10 {"?"}”
+  let ipsum-render = [
+    #if mode == "fade" {
+      let results = range(0, pars).map(i => {
+        let count = int(start * calc.pow(ratio, i))
+        if count < 1 { count = 1 }
+        let content = [
+          #if paragraph-word-count { text(weight: "bold")[#count words:] }
+          #h(indent)#lorem(count)
         ]
-      } else {
-        len = int(25 + calc.abs(length-noise * 45))
-        content = [#h(indent)#lorem(len)]
+        (len: count, content: content)
+      })
+
+      if stats {
+        actual-words = results.map(r => r.len).sum()
+        actual-pars = results.len()
+        if ratio > 0.9 { stats-note.push("Ratio is high (" + str(ratio) + "). Decrease to fade text faster.") }
       }
 
-      (len: len, content: content)
-    })
-
-    if stats {
-      actual-words = results.map(r => r.len).sum()
-      actual-pars = results.len()
+      stack(dir: ttb, spacing: spacing, ..results.map(r => r.content))
     }
 
-    stack(dir: ttb, spacing: spacing * 0.8, ..results.map(r => r.content))
-  }
+    #if mode == "grow" {
+      let results = range(1, pars + 1).map(i => {
+        let count = int(base + (factor * calc.ln(i)))
+        let content = [
+          #if paragraph-word-count { text(weight: "bold")[#count words:] }
+          #h(indent)#lorem(count)
+        ]
+        (len: count, content: content)
+      })
+
+      if stats {
+        actual-words = results.map(r => r.len).sum()
+        actual-pars = results.len()
+      }
+
+      stack(dir: ttb, spacing: spacing, ..results.map(r => r.content))
+    }
+
+    #if mode == "fit" {
+      // a = S * (1 - r) / (1 - r^n)
+      let first-len = total * (1 - ratio) / (1 - calc.pow(ratio, pars))
+
+      let results = range(0, pars).map(i => {
+        let len = int(first-len * calc.pow(ratio, i))
+        if len < 1 { len = 1 }
+        let content = [
+          #if paragraph-word-count { text(weight: "bold")[#len words:] }
+          #h(indent)#lorem(len)
+        ]
+        (len: len, content: content)
+      })
+
+      if stats {
+        actual-words = results.map(r => r.len).sum()
+        actual-pars = results.len()
+        let diff = calc.abs(actual-words - total)
+        if diff > (total * 0.05) {
+          stats-note.push("Result deviates from target " + str(total) + " by " + str(diff) + " words due to integer rounding.")
+          stats-note.push("Try slightly adjusting `ratio` or `pars` for better fit.")
+        }
+      }
+
+      stack(dir: ttb, spacing: spacing, ..results.map(r => r.content))
+    }
+
+    #if mode == "fibonacci" {
+      set par(justify: true, first-line-indent: 1.5em)
+
+      let get-fibs(steps) = {
+        let nums = (1, 1)
+        while nums.len() < steps {
+          let len = nums.len()
+          let next = nums.at(len - 1) + nums.at(len - 2)
+          nums.push(next)
+        }
+        return nums
+      }
+
+      let fibs = get-fibs(steps)
+      let reversed-fibs = if reverse { fibs.rev() } else { fibs }
+
+      if stats {
+        actual-words = reversed-fibs.sum()
+        actual-pars = reversed-fibs.len()
+      }
+
+      stack(dir: ttb, spacing: spacing, ..reversed-fibs.map(count => {
+        grid(
+          columns: (3em, 1fr),
+          gutter: 1em,
+          align(right + top)[
+            #text(weight: "bold", fill: gray)[#count]
+          ],
+          [#lorem(count)],
+        )
+      }))
+    }
+
+    #if mode == "natural" {
+      let results = range(0, pars).map(i => {
+        let noise = calc.sin((i + 1) * seed)
+        let len = int(average + (noise * var))
+
+        if noise > 0.8 {
+          len = int(len * 1.5)
+        } else if noise < -0.8 {
+          len = int(len * 0.4)
+        }
+
+        if len < 5 { len = 5 }
+
+        (len: len, content: [#h(indent)#lorem(len)])
+      })
+
+      if stats {
+        actual-words = results.map(r => r.len).sum()
+        actual-pars = results.len()
+        if var > (average * 0.7) {
+          stats-note.push("High variance detected. If paragraphs look too chaotic, reduce `var`.")
+        }
+      }
+
+      stack(dir: ttb, spacing: spacing, ..results.map(r => r.content))
+    }
+
+    #if mode == "dialogue" {
+      let results = range(0, events).map(i => {
+        let noise = calc.sin((i + 9) * seed)
+        let length-noise = calc.cos((i + 3) * seed)
+        let is-dialogue = noise < (ratio * 2 - 1)
+        let len = 0
+        let content = []
+
+        if is-dialogue {
+          len = int(3 + calc.abs(length-noise * 12))
+          content = par(hanging-indent: h-indent)[
+            #h(indent)“#lorem(len)#if len < 10 {"?"}”
+          ]
+        } else {
+          len = int(25 + calc.abs(length-noise * 45))
+          content = [#h(indent)#lorem(len)]
+        }
+
+        (len: len, content: content)
+      })
+
+      if stats {
+        actual-words = results.map(r => r.len).sum()
+        actual-pars = results.len()
+      }
+
+      stack(dir: ttb, spacing: spacing, ..results.map(r => r.content))
+    }
+  ]
+
+  set par(spacing: spacing)
+
+  ipsum-render
 
   if stats {
     _nerdstats(mode, actual-words, actual-pars, notes: stats-note)
