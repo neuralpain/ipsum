@@ -159,12 +159,12 @@
   )
 
   let param-map = (
-    "natural":    ("pars", "average", "var", "seed", "indent"),
-    "grow":       ("pars", "base", "factor", "indent"),
-    "fade":       ("pars", "start", "ratio", "indent"),
-    "fit":        ("pars", "total", "ratio", "indent"),
-    "dialogue":   ("events", "ratio", "seed", "indent"),
-    "fibonacci":  ("steps", "reverse"),
+    "natural":    ("pars", "average", "var", "seed", "spacing", "indent"),
+    "grow":       ("pars", "base", "factor", "spacing", "indent"),
+    "fade":       ("pars", "start", "ratio", "spacing", "indent"),
+    "fit":        ("pars", "total", "ratio", "spacing", "indent"),
+    "dialogue":   ("events", "ratio", "seed", "spacing", "indent"),
+    "fibonacci":  ("steps", "reverse", "spacing"),
   )
 
   if type(mode) != str {
