@@ -125,7 +125,7 @@
   justify: false,
   indent: 0em,
   h-indent: 0em,
-  paragraph-word-count: false,
+  word-count: false,
   // System
   hint: false,
   stats: false,
@@ -277,7 +277,7 @@
         let count = int(start * calc.pow(ratio, i))
         if count < 1 { count = 1 }
         let content = [
-          #if paragraph-word-count { text(weight: "bold")[#count words:] }
+          #if word-count { text(weight: "bold")[#count words:] }
           #h(indent)#lorem(count)
         ]
         (len: count, content: content)
@@ -296,7 +296,7 @@
       let results = range(1, pars + 1).map(i => {
         let count = int(base + (factor * calc.ln(i)))
         let content = [
-          #if paragraph-word-count { text(weight: "bold")[#count words:] }
+          #if word-count { text(weight: "bold")[#count words:] }
           #h(indent)#lorem(count)
         ]
         (len: count, content: content)
@@ -318,7 +318,7 @@
         let len = int(first-len * calc.pow(ratio, i))
         if len < 1 { len = 1 }
         let content = [
-          #if paragraph-word-count { text(weight: "bold")[#len words:] }
+          #if word-count { text(weight: "bold")[#len words:] }
           #h(indent)#lorem(len)
         ]
         (len: len, content: content)
