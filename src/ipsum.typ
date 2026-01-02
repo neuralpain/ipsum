@@ -110,27 +110,22 @@
 #let ipsum(
   mode: "natural",
   pars: 5,
-  indent: 0em,
-  start: 100,
-  spacing: 1em,
-  justify: false,
-  ratio: __golden,
-  // Geometric
-  total: 300,
-  // Logarithmic
+  events: 10,
   base: 20,
-  factor: 30,
-  paragraph-word-count: false,
-  // Fibonacci
+  start: 100,
+  total: 300,
+  var: 30,
+  average: 60,
+  factor: 50,
+  seed: 42,
+  ratio: __golden,
   steps: 8,
   reverse: true,
-  // Human Flow
-  average: 60,
-  var: 30,
-  seed: 42,
-  // Dialogue
-  events: 10,
+  spacing: 1em,
+  justify: false,
+  indent: 0em,
   h-indent: 0em,
+  paragraph-word-count: false,
   // System
   hint: false,
   stats: false,
