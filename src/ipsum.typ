@@ -276,8 +276,6 @@
     }
   }
 
-  if mode == "fibonacci" or mode == "dialogue" { pars = 0 }
-
   let ipsum-render = [
     #if mode == "fade" {
       let results = range(0, pars).map(i => {
