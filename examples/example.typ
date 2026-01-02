@@ -24,7 +24,7 @@
   #v(0.5em)
 ]
 
-// Document title
+// document title
 #place(float: true, top + center, scope: "parent")[
   #text(18pt, weight: "bold")[#lorem(6)] \
   #v(0.5em)
@@ -33,8 +33,7 @@
   #v(2em)
 ]
 
-#show "Abstract": smallcaps
-*Abstract*
+#smallcaps[*Abstract*]
 #ipsum(
   mode: "fade",
   pars: 3,
@@ -47,7 +46,7 @@
 
 == #lorem(15)
 
-// Using "Natural" mode for body to look like real writing
+// Using "natural" mode for body to look like real writing
 #ipsum(
   mode: "natural",
   pars: 4,
@@ -57,7 +56,7 @@
 
 = #lorem(5)
 
-// "Grow" implies increasing complexity in technical sections
+// "grow" implies increasing complexity in technical sections
 == #lorem(3)
 #ipsum(
   mode: "grow",
@@ -80,8 +79,8 @@ The following transcript demonstrates the interview process:
   radius: 5pt,
   width: 100%,
 )[
-  // Using Dialogue mode to simulate an interview transcript
-  #set text(size: 9pt, font: "Courier New")
+  // Using "dialogue" mode to simulate an interview transcript
+  #set text(size: 9pt, font: "Roboto Mono")
   #ipsum(
     mode: "dialogue",
     events: 8,
@@ -93,10 +92,10 @@ The following transcript demonstrates the interview process:
 = #lorem(3)
 
 // Here we need to fill space to push the next section to the
-// end of the column using "Fit".
+// end of the column using "fit".
 #ipsum(
   mode: "fit",
-  total: 300,
+  total: 250,
   pars: 4,
   ratio: 0.9, // Consistent paragraph sizes
 )
