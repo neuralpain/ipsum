@@ -1,7 +1,7 @@
 /*
   File: ipsum.typ
   Author: neuralpain
-  Date Modified: 2025-12-30
+  Date Modified: 2026-01-03
 
   Description: Lorem's Ipsum.
 */
@@ -153,13 +153,14 @@
     "fibonacci",  // Mathematic
   )
 
+  let common-param = ("spacing", "indent")
   let param-map = (
-    "natural":    ("pars", "average", "var", "seed", "spacing", "indent"),
-    "grow":       ("pars", "base", "factor", "spacing", "indent"),
-    "fade":       ("pars", "start", "ratio", "spacing", "indent"),
-    "fit":        ("pars", "total", "ratio", "spacing", "indent"),
-    "dialogue":   ("events", "ratio", "seed", "spacing", "indent"),
-    "fibonacci":  ("steps", "reverse", "spacing"),
+    "natural":    ("pars", "average", "var", "seed", ..common-param),
+    "grow":       ("pars", "base", "factor", "word-count", ..common-param),
+    "fade":       ("pars", "start", "ratio", "word-count", ..common-param),
+    "fit":        ("pars", "total", "ratio", "word-count", ..common-param),
+    "dialogue":   ("events", "ratio", "seed", ..common-param),
+    "fibonacci":  ("steps", "reverse", "word-count", ..common-param),
   )
 
   if type(mode) != str {
