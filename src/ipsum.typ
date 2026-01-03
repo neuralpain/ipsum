@@ -359,14 +359,18 @@
       }
 
       stack(dir: ttb, spacing: spacing, ..reversed-fibs.map(count => {
-        grid(
-          columns: (3em, 1fr),
-          gutter: 1em,
-          align(right + top)[
-            #text(weight: "bold", fill: gray)[#count]
-          ],
-          [#lorem(count)],
-        )
+        if word-count {
+          grid(
+            columns: (3em, 1fr),
+            gutter: 1em,
+            align(right + top)[
+              #text(weight: "bold", fill: gray)[#count]
+            ],
+            [#h(indent)#lorem(count)],
+          )
+        } else {
+          [#h(indent)#lorem(count)]
+        }
       }))
     }
 
