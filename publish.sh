@@ -18,9 +18,9 @@ packages_fork_address="${http}$username/$packages_fork_name"
 echo "======== Creating partial clone ========"
 
 cd ..
-rm -rf typst-packages
+rm -rf $packages_fork_name
 git clone --depth 1 --no-checkout --filter="tree:0" $packages_fork_address
-cd typst-packages
+cd $packages_fork_name
 git sparse-checkout init
 git sparse-checkout set packages/preview/$package_name
 git remote add upstream $upstream
@@ -30,7 +30,7 @@ git checkout main
 
 echo "======== Updating with latest commit ========"
 
-# cd typst-packages
+# cd $packages_fork_name
 git log -n 1
 git fetch upstream --depth=1
 git reset --hard upstream/main
@@ -40,20 +40,20 @@ cd ..
 echo "======== Creating directories ========"
 
 # If this is a brand new package, the directory will need to be created
-# manually as it does not yet exist on the Typst packages Github repository.
-if [ ! -d "typst-packages/packages/preview/$package_name" ]; then
-  mkdir -v "typst-packages/packages"
-  mkdir -v "typst-packages/packages/preview"
-  mkdir -v "typst-packages/packages/preview/$package_name"
+# manually as it does not yet exist on the typst/packages Github repository.
+if [ ! -d "$packages_fork_name/packages/preview/$package_name" ]; then
+  mkdir -v "$packages_fork_name/packages"
+  mkdir -v "$packages_fork_name/packages/preview"
+  mkdir -v "$packages_fork_name/packages/preview/$package_name"
 fi
 # Create new version directories. Empty folders will not be committed to git.
-mkdir -v "typst-packages/packages/preview/$package_name/$version"
-mkdir -v "typst-packages/packages/preview/$package_name/$version/examples"
-mkdir -v "typst-packages/packages/preview/$package_name/$version/src"
+mkdir -v "$packages_fork_name/packages/preview/$package_name/$version"
+mkdir -v "$packages_fork_name/packages/preview/$package_name/$version/examples"
+mkdir -v "$packages_fork_name/packages/preview/$package_name/$version/src"
 
 # ---
 # Destination directory
-dest="typst-packages/packages/preview/$package_name/$version"
+dest="$packages_fork_name/packages/preview/$package_name/$version"
 
 echo "======== Copying new files ========"
 
@@ -82,7 +82,7 @@ echo "======== Committing changes on new branch ========"
 
 new_branch=$package_name-$version
 commit_message=$package_name:$version
-cd typst-packages
+cd $packages_fork_name
 git branch $new_branch
 git switch $new_branch
 git add .
@@ -92,7 +92,7 @@ git log -n 1
 echo "======== Pushing new branch ========"
 
 # NOTE: This is a test. Remove `--dry-run` to actually push your code upstream.
-git push --dry-run origin $new_branch
+git push --dry-run origin $new_branch # --force # <-- Overwrite branch on origin
 cd ..
 
 echo "======== Done ========"
