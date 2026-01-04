@@ -1,7 +1,7 @@
 /*
   File: ipsum.typ
   Author: neuralpain
-  Date Modified: 2026-01-03
+  Date Modified: 2026-01-04
 
   Description: Lorem's Ipsum.
 */
@@ -107,6 +107,32 @@
   ]
 }
 
+/// Generate blind text through different modes such as natural writing,
+/// dialogue patterns, geometric structures, and mathematical sequences.
+///
+/// - mode (string): The generation method.
+/// - pars (int): Number of paragraphs to generate. Applies to most modes.
+/// - events (int): `Dialogue` — Total number of lines (narrative or spoken).
+/// - base (int): `Grow` — Minimum base word count.
+/// - start (int): `Fade` — The word count of the first paragraph.
+/// - total (int): `Fit` — The sum of words across all generated paragraphs.
+/// - var (int): `Natural` — How much the length deviates from the average.
+/// - average (int): `Natural` — The baseline word count per paragraph.
+/// - factor (int): `Grow` — The steepness of the growth curve.
+/// - seed (int): `Natural, Dialogue` — Random seed for variations.
+/// - ratio (float): Decay/growth rate or dialogue probability.
+/// - steps (int): `Fibonacci` — How many steps of the sequence to generate.
+/// - reverse (bool): Switch to reverse the sequence.
+/// - spacing (length): Vertical spacing between paragraphs.
+/// - justify (bool): Whether to justify the generated text.
+/// - indent (length): Paragraph first line indent.
+/// - h-indent (length): `Dialogue` — Paragraph hanging indent.
+/// - word-count (bool): Display paragraph word count.
+/// - hint (bool): Displays the valid parameters for the selected mode.
+/// - stats (bool): Show generation statistics and notes.
+/// - ignore-limits (bool): Allow values to go past safe limits.
+/// - ignore-warnings (bool): Hide warning text when thresholds are exceeded.
+/// -> content
 #let ipsum(
   mode: "natural",
   pars: 5,
