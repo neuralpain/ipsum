@@ -14,7 +14,8 @@ http="https://github.com/"
 upstream="${http}typst/packages"
 packages_fork_address="${http}$username/$packages_fork_name"
 
-echo "======== Creating partial clone ========" # latest commit for your package
+# This will clone the latest commit for your package, if it exists.
+echo "======== Creating partial clone ========"
 
 cd ..
 rm -rf typst-packages
@@ -25,11 +26,11 @@ git sparse-checkout set packages/preview/$package_name
 git remote add upstream $upstream
 git config remote.upstream.partialclonefilter tree:0
 git checkout main
-cd ..
+# cd ..
 
 echo "======== Updating with latest commit ========"
 
-cd typst-packages
+# cd typst-packages
 git log -n 1
 git fetch upstream --depth=1
 git reset --hard upstream/main
@@ -38,18 +39,44 @@ cd ..
 
 echo "======== Creating directories ========"
 
-mkdir -v typst-packages/packages/preview/$package_name/$version
-mkdir -v typst-packages/packages/preview/$package_name/$version/examples
-mkdir -v typst-packages/packages/preview/$package_name/$version/src
+# If this is a brand new package, the directory will need to be created
+# manually as it does not yet exist on the Typst packages Github repository.
+if [ ! -d "typst-packages/packages/preview/$package_name" ]; then
+  mkdir -v "typst-packages/packages"
+  mkdir -v "typst-packages/packages/preview"
+  mkdir -v "typst-packages/packages/preview/$package_name"
+fi
+# Create new version directories. Empty folders will not be committed to git.
+mkdir -v "typst-packages/packages/preview/$package_name/$version"
+mkdir -v "typst-packages/packages/preview/$package_name/$version/examples"
+mkdir -v "typst-packages/packages/preview/$package_name/$version/src"
+
+# ---
+# Destination directory
+dest="typst-packages/packages/preview/$package_name/$version"
 
 echo "======== Copying new files ========"
 
-cp -rv $repository/examples typst-packages/packages/preview/$package_name/$version
-cp -rv $repository/src typst-packages/packages/preview/$package_name/$version
-cp -v $repository/lib.typ typst-packages/packages/preview/$package_name/$version
-cp -v $repository/LICENSE typst-packages/packages/preview/$package_name/$version
-cp -v $repository/README.md typst-packages/packages/preview/$package_name/$version
-cp -v $repository/typst.toml typst-packages/packages/preview/$package_name/$version
+cp -rv "$repository/examples" $dest
+cp -rv "$repository/src" $dest
+cp -v "$repository/lib.typ" $dest
+cp -v "$repository/LICENSE" $dest
+cp -v "$repository/README.md" $dest
+cp -v "$repository/typst.toml" $dest
+
+echo "======== Removing PDFs ========"
+
+find $dest -name "*.pdf" -type f -delete -print
+
+echo "======== Removing Temporary Files ========"
+
+find $dest -name "*.bak" -type f -delete -print
+find $dest -name "*.tmp" -type f -delete -print
+find $dest -name "*temp*" -type f -delete -print
+
+echo "======== Removing Test Files ========"
+
+find $dest -name "*test*" -type f -delete -print
 
 echo "======== Committing changes on new branch ========"
 
